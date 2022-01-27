@@ -8,7 +8,6 @@ WhatsApp API to send your message easily based on Express
 - Fix string escape char
 - Send image
 - Send document
-- Remove message after message sended (for privacy)
 - QR Code via HTTP
 
 # Getting Started
@@ -27,7 +26,7 @@ Clone this Repository
 git clone https://github.com/icaksh/whatsapp-express-api
 ```
 
-Edit what you need to edit (API) in `src/config.json`
+Edit what you need to edit (API) in `.env`
 
 Install the dependencies
 ```

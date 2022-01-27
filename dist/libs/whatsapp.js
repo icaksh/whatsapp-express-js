@@ -12,21 +12,23 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.authWA = void 0;
+exports.sendMessage = exports.authWA = void 0;
 const baileys_1 = require("@adiwajshing/baileys");
 const fs_1 = __importDefault(require("fs"));
 const conn = new baileys_1.WAConnection();
 const authWA = () => __awaiter(void 0, void 0, void 0, function* () {
-    if (fs_1.default.existsSync("./data/cache.json")) {
-        conn.loadAuthInfo("./data/cache.json");
+    if (fs_1.default.existsSync(__dirname + "/../data/cache.json")) {
+        conn.loadAuthInfo(__dirname + "/../data/cache.json");
     }
     conn.connect().then(() => {
-        fs_1.default.writeFileSync("./data/cache.json", JSON.stringify(conn.base64EncodedAuthInfo()));
+        fs_1.default.writeFileSync(__dirname + "/../data/cache.json", JSON.stringify(conn.base64EncodedAuthInfo()));
+        conn.removeAllListeners();
         console.log("[OK] Authenticated");
     })
         .catch(e => {
-        if (fs_1.default.existsSync("./data/cache.json")) {
-            fs_1.default.unlinkSync("./data/cache.json");
+        console.log(e);
+        if (fs_1.default.existsSync(__dirname + "/../data/cache.json")) {
+            fs_1.default.unlinkSync(__dirname + "/../data/cache.json");
         }
         console.log("[ERROR] Failed to Authenticated");
         conn.clearAuthInfo();
@@ -34,8 +36,15 @@ const authWA = () => __awaiter(void 0, void 0, void 0, function* () {
     });
 });
 exports.authWA = authWA;
-function sendMessage(phoneNumber, messageSend) {
-    conn.sendMessage(phoneNumber + "@s.whatsapp.net", `${messageSend}`, baileys_1.MessageType.text);
-    console.log("Pesan berhasil dikirimkan");
-}
-exports.default = sendMessage;
+const sendMessage = (phoneNumber, messageSend) => __awaiter(void 0, void 0, void 0, function* () {
+    let success = false;
+    yield conn.sendMessage(phoneNumber + "@s.whatsapp.net", `${messageSend}`, baileys_1.MessageType.text)
+        .then((WebMmessageInfo) => {
+        conn.modifyChat(phoneNumber + "@s.whatsapp.net", 'delete');
+        success = true;
+    }).catch(e => {
+        console.log(e);
+    });
+    return success;
+});
+exports.sendMessage = sendMessage;
